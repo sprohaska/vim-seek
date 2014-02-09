@@ -155,7 +155,10 @@ else
   endfunction
 endif
 
-function! s:seek(plus)
+function! s:seek(plus, ...)
+  if a:0 > 0
+      normal! gv
+  endif
   let pos = col('.')
   let line = getline('.')
   let seek = s:findTargetFwd(l:pos, v:count1, l:line)
@@ -164,13 +167,19 @@ function! s:seek(plus)
   endif
 endfunction
 
-function! s:seekOrSubst(plus)
+function! s:seekOrSubst(plus, ...)
+  if a:0 > 0
+      normal! gv
+  endif
   if v:count >= 1 | call feedkeys('c' . v:count . 'l')
   else | call s:seek(a:plus)
   endif
 endfunction
 
-function! s:seekBack(plus)
+function! s:seekBack(plus, ...)
+  if a:0 > 0
+      normal! gv
+  endif
   let pos = col('.')
   let line = getline('.')
   let seek = s:findTargetBwd(l:pos, v:count1, l:line)
@@ -265,6 +274,9 @@ else
         \ :<C-U>call <SID>seekOrSubst(0)<CR>
 endif
 
+silent! vnoremap <unique> <Plug>(seek-seek)
+    \ :<C-U>call <SID>seek(0, 'v')<CR>
+
 silent! onoremap <unique> <Plug>(seek-seek)
       \ :<C-U>call <SID>seek(1)<CR>
 silent! onoremap <unique> <Plug>(seek-seek-cut)
@@ -272,6 +284,8 @@ silent! onoremap <unique> <Plug>(seek-seek-cut)
 
 silent! nnoremap <unique> <Plug>(seek-back)
       \ :<C-U>call <SID>seekBack(0)<CR>
+silent! vnoremap <unique> <Plug>(seek-back)
+      \ :<C-U>call <SID>seekBack(0, 'v')<CR>
 silent! onoremap <unique> <Plug>(seek-back)
       \ :<C-U>call <SID>seekBack(0)<CR>
 silent! onoremap <unique> <Plug>(seek-back-cut)
@@ -319,10 +333,12 @@ let seekBackJumpRA = get(g:, 'seekBackJumpPresentialInnerKey', 'U')
 "endif
 
 execute "nmap <silent>" seekSeek "<Plug>(seek-seek)"
+execute "vmap <silent>" seekSeek "<Plug>(seek-seek)"
 execute "omap <silent>" seekSeek "<Plug>(seek-seek)"
 execute "omap <silent>" seekCut "<Plug>(seek-seek-cut)"
 
 execute "nmap <silent>" seekBack "<Plug>(seek-back)"
+execute "vmap <silent>" seekBack "<Plug>(seek-back)"
 execute "omap <silent>" seekBack "<Plug>(seek-back)"
 execute "omap <silent>" seekBackCut "<Plug>(seek-back-cut)"
 
